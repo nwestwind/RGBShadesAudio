@@ -352,21 +352,11 @@ void radiateCenterMultiPalette() {
     fadeActive = 1;
     selectRandomPalette();
   }
-
-  // Periodically choose a new palette, speed, and scale
   ChangePaletteAndSettingsPeriodically();
-
-  // generate noise data
-  fillnoise8();
-  
-  // convert the noise data to colors in the LED array
-  // using the current palette
-  mapNoiseToLEDsUsingPalette();
 
   int xOffset = 0;
   int yOffset = 4;
 
-  // Draw one frame of the animation into the LED array
   for (int x = 0; x < kMatrixWidth; x++) {
     for (int y = 0; y < kMatrixHeight; y++) {
       byte color = sin8(sqrt(sq(((float)x - 7.5) * 12 + xOffset) + sq(((float)y - 2) * 12 + yOffset)) + offset);
@@ -376,6 +366,7 @@ void radiateCenterMultiPalette() {
   offset--; // wraps at 255 for sin8
   plasVector += 1; // using an int for slower orbit (wraps at 65536)
 }
+
 const byte eyeBitmap[5] = {
   0b00111000,
   0b01111100,
@@ -886,7 +877,7 @@ void drawAnalyzer() {
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 10;
-    selectRandomAudioPalette();
+    selectRandomPalette();
     audioActive = true;
     fadeActive = 0;
   }
@@ -937,7 +928,7 @@ void drawVU() {
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 10;
-    selectRandomAudioPalette();
+    selectRandomPalette();
     audioActive = true;
     fadeActive = 0;
   }
@@ -1011,7 +1002,7 @@ void audioPlasma() {
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 10;
-    selectRandomAudioPalette();
+    selectRandomPalette();
     audioActive = true;
     fadeActive = 0;
   }
@@ -1083,7 +1074,7 @@ void audioSpin() {
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 10;
-    selectRandomAudioPalette();
+    selectRandomPalette();
     audioActive = true;
     fadeActive = 0;
   }
@@ -1117,7 +1108,7 @@ void audioStripes() {
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 25;
-    selectRandomAudioPalette();
+    selectRandomPalette();
     fadeActive = 0;
     audioActive = true;
   }
@@ -1354,7 +1345,7 @@ void noiseFlyer() {
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 10;
-    selectRandomNoisePalette();
+    selectRandomPalette();
 
     audioActive = true;
   }
