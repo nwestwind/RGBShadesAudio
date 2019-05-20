@@ -1,41 +1,3 @@
-//   RGB Shades Audio Demo Code - REQUIRES MSGEQ7 AUDIO SENSOR
-//   Copyright (c) 2015 macetech LLC
-//   This software is provided under the MIT License (see license.txt)
-//   Special credit to Mark Kriegsman for XY mapping code
-//
-//   Use Version 3.0 or later https://github.com/FastLED/FastLED
-//   ZIP file https://github.com/FastLED/FastLED/archive/master.zip
-//
-//   Use Arduino IDE 1.0 or later
-//
-//   If your RGB Shades were purchased before July 2015:
-//     This version has the standard Arduino bootloader. R9 and R10 near the control buttons will be present.
-//     Select the “Arduino Pro or Pro Mini” option.
-//     Then, go back into the Tools menu and find the Processor option and select “ATmega328 (5V, 16MHz)”.
-//
-//   If your RGB Shades were purchased after July 2015:
-//     This version has the Optiboot bootloader. R9 and 10 near the control buttons will be missing.
-//     Select the “Arduino Mini” option.
-//     Then, go back into the Tools menu and find the Processor option and select “ATmega328”.
-//
-//   [Press] the SW1 button to cycle through available effects
-//   Effects will also automatically cycle at startup
-//   [Press and hold] the SW1 button (one second) to switch between auto and manual mode
-//     * Auto Mode (one blue blink): Effects automatically cycle over time
-//     * Manual Mode (two red blinks): Effects must be selected manually with SW1 button
-//
-//   [Press] the SW2 button to cycle through available brightness levels
-//   [Press and hold] the SW2 button (one second) to reset brightness to startup value
-//
-//   [Press] SW1 and SW2 together to toggle between audio and non-audio effect sets
-//   You can edit the mix of effects (for example, both audio and standard patterns in the same set)
-//   Simply edit effectListAudio[] and effectListNoAudio[] below
-//   When audio/non-audio mode has been toggled, you will see three green blinks.
-//
-//   Brightness, selected effect, and auto-cycle are saved in EEPROM after a delay
-//   The RGB Shades will automatically start up with the last-selected settings
-
-// RGB Shades data output to LEDs is on pin 5
 #define LED_PIN  5
 
 // RGB Shades color order (Green/Red/Blue)
@@ -59,10 +21,13 @@
 #include <FastLED.h>
 #include <EEPROM.h>
 #include "messages.h"
+#include "graphicsframe.h"
 #include "font.h"
+#include "palettes.h"
 #include "XYmap.h"
 #include "utils.h"
 #include "audio.h"
+#include "FireworksXY.h"
 #include "effects.h"
 #include "buttons.h"
 
@@ -74,32 +39,52 @@ functionList effectListAudio[] = {
                                   audioStripes,
                                   audioCirc,
                                   drawVU,
-                                  //RGBpulse,
+                                  RGBpulse,
                                   audioPlasma,
                                   drawAnalyzer
                                  };
 
-functionList effectListNoAudio[] = {
-                                    shadesOutline,
-                                    threeSine,
-                                    //drawVU,
-                                    threeDee,
-                                    hearts,
-                                    //scrollTextZero,
-                                    plasma,
-                                    //RGBpulse,
-                                    confetti,
-                                    //audioCirc,
-                                    rider,
-                                    //scrollTextOne,
-                                    glitter,
-                                    //drawAnalyzer,
+functionList effectListNoAudio[] = {amazingNoise,
+                                    Fire2012WithPalette, 
+                                    snow,
                                     slantBars,
-                                    //scrollTextTwo,
-                                    //audioPlasma,
+                                    eyesAnim,
+                                    coloredSnow,
+                                    colorRotation,
+                                    barfight,
+                                    radiateCenter,
+                                    shadesOutline,
+                                    eyes, 
+                                    // shadesOutline2,
+                                    fireworks,  
+                                    shadesOutline3,
+                                    vertThreeSine,
+                                    amazing,
+                                    // barfight2,
+                                    hearts,
+                                    threeSine, 
+                                    radiateCenterMultiPalette,
+                                    plasma,
+                                    confetti,
+                                    rider,
+                                    glitter,
+                                    threeDee,
                                     colorFill,
-                                    //audioStripes,
                                     sideRain
+                                    // shadesOutline,
+                                    // threeSine,
+                                    // threeDee,
+                                    // hearts,
+                                    // plasma,
+                                    // confetti,
+                                    // rider,
+                                    // glitter,
+                                    // slantBars, 
+                                    // colorFill,
+                                    // sideRain
+                                    //scrollTextZero,
+                                    //scrollTextOne,
+                                    //scrollTextTwo,
                                    };
 
 
@@ -152,9 +137,6 @@ void setup() {
   random16_add_entropy(analogRead(ANALOGPIN));
   //Serial.begin(115200);
 }
-
-
-
 // Runs over and over until power off or reset
 void loop()
 {
@@ -207,8 +189,3 @@ void loop()
   FastLED.show(); // send the contents of the led memory to the LEDs
 
 }
-
-
-
-
-

@@ -6,6 +6,544 @@
 //    * All animation should be controlled with counters and effectDelay, no delay() or loops
 //    * Pixel data should be written using leds[XY(x,y)] to map coordinates to the RGB Shades layout
 
+
+uint8_t mul1 = 7;                                            // Frequency, thus the distance between waves
+uint8_t mul2 = 6;
+uint8_t mul3 = 5;
+int wave1=0;                                                  // Current phase is calculated.
+int wave2=0;
+int wave3=0;
+
+void vertThreeSine() {
+
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 20;
+    FastLED.clear();
+    selectRandomPalette();
+   // CRGBPalette16 targetPalette(PartyColors_p);
+    fadeActive = 0;
+  }   
+
+  ChangePaletteAndSettingsPeriodically();
+
+  mapNoiseToLEDsUsingPalette();
+
+  wave1 += beatsin8(10,-4,4);
+  wave2 += beatsin8(15,-2,2);
+  wave3 += beatsin8(12,-3, 3);
+  for (byte x = 0; x<kMatrixWidth; x++) {
+    for (int y=0; y<kMatrixHeight; y++) {
+      uint8_t tmp = sin8(mul1*y + wave1) + sin8(mul1*y + wave2) + sin8(mul1*y + wave3);
+      leds[XY(x,y)] = ColorFromPalette(currentPalette, tmp, 255);
+    }    
+  }
+}
+
+uint8_t angle = 16;
+void amazing() {
+
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 10;
+    FastLED.clear();
+    // selectRandomPalette();
+    //currentPalette = retro2_16_gp;
+    fadeActive = 1;
+  }
+  uint8_t h = sin8(angle);
+  
+  for (int16_t x= kMatrixWidth; x>=0; --x) {
+    for (int16_t y= kMatrixHeight; y>=0; --y) {
+      leds[XY(x, y)] = CHSV(h, 255, 255);
+      h += 32;
+    }
+  }
+  angle += 4;
+}
+
+// void shadesOutline2() {
+//   static boolean erase = false;
+//   static uint8_t x, y, z = 0;
+//   static uint8_t currentColor = 0;
+//   //startup tasks
+//   if (effectInit == false) {
+//     effectInit = true;
+//     audioActive = true;
+//     erase = false;
+//     x = 0;
+//     y = 0;
+//     z = 0;
+//     effectDelay = 1;
+//     FastLED.clear();    
+//    // selectRandomPalette();
+//     currentPalette = RainbowColors_p;
+//     fadeActive = 0;
+//   }
+
+//   const uint8_t OutlineTable[] = {
+//     6,5,4,3,2,1,0,29,30,57,58,59,60,61,62,51,36,22,23,24,25,26,27,28,31,56,55,54,53,52,35,34,33,32,31
+//   };
+//   const uint8_t OutlineTable2[] = {
+//     7,8,9,10,11,12,13,14,43,44,67,66,65,64,63,50,37,21,20,19,18,17,16,15,42,45,46,47,48,49,38,39,40,41
+//   };
+  
+//   leds[OutlineTable[x]] = currentPalette[currentColor];
+//   leds[OutlineTable2[y]] = currentPalette[currentColor];
+//   if (erase)    
+//     leds[OutlineTable[x]] = currentPalette[currentColor];
+//     leds[OutlineTable2[y]] = currentPalette[currentColor];
+//   x++;
+//   y++;
+//   if (x == (sizeof(OutlineTable)) || y == (sizeof(OutlineTable2))) {
+//     erase = !erase;
+//     x = 0; 
+//     y = 0;
+//     currentColor += random8(3, 6);
+//      if (currentColor > 15) currentColor -= 16;
+//   }
+// }
+
+
+void shadesOutline3() {
+  static boolean erase = false;
+  static uint8_t x, y, z = 0;
+  static uint8_t currentColor = 0;
+  //startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    audioActive = true;
+    erase = false;
+    x = 0;
+    y = 0;
+    z = 0;
+    effectDelay = 15;
+    FastLED.clear();
+    // selectRandomPalette();
+    currentPalette = RainbowColors_p;
+    fadeActive = 0;
+  }
+  
+  const uint8_t OutlineTable[] = {
+    6,5,4,3,2,1,0,29,30,57,58,59,60,61,62,51,36,22,23,24,25,26,27,28,31,56,55,54,53,52,35,34,33,32,31
+  };
+  const uint8_t OutlineTable2[] = {
+    7,8,9,10,11,12,13,14,43,44,67,66,65,64,63,50,37,21,20,19,18,17,16,15,42,45,46,47,48,49,38,39,40,41
+  };
+  
+  leds[OutlineTable[x]] = currentPalette[currentColor];
+  leds[OutlineTable2[y]] = currentPalette[currentColor];
+  if (erase)    
+    leds[OutlineTable[x]] = currentPalette[currentColor];
+    leds[OutlineTable2[y]] = currentPalette[currentColor];
+  x++;
+  y++;
+  if (x == (sizeof(OutlineTable)) || y == (sizeof(OutlineTable2))) {
+    erase = !erase;
+    x = 0; 
+    y = 0;
+    currentColor += random8(3, 6);
+     if (currentColor > 15) currentColor -= 16;
+  }
+}
+
+void barfight() {
+
+  static byte barpos[16];
+  
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    audioActive = true;
+    effectDelay = 40;
+    for (byte i = 0; i < kMatrixWidth; i++) {
+      barpos[i] = random8(0,8);
+    }
+  }
+
+  for (byte x = 0; x < kMatrixWidth; x++) {
+    for (byte y = 0; y < kMatrixHeight; y++) {
+      if (y < barpos[x]) {
+        leds[XY(x,y)] = CRGB::Red;
+        //leds[XY(x,y)] = CRGB(255, 0, 0);
+        //leds[XY(x,y)] = CHSV(cycleHue, 255, 255);
+      } else {
+        leds[XY(x,y)] = CRGB::Yellow;
+      }
+    }
+
+    byte tempIncr = random(0,6);
+    if (barpos[x] > 0 && tempIncr == 0) barpos[x]--;
+    if (barpos[x] < 16 && tempIncr == 2) barpos[x]++;    
+  }
+}
+
+// void barfight2() {
+
+//   static byte barpos[16];
+  
+//   // startup tasks
+//   if (effectInit == false) {
+//     effectInit = true;
+//     audioActive = true;
+//     effectDelay = 0;
+//     for (byte i = 0; i < kMatrixWidth; i++) {
+//       barpos[i] = random8(0,8);
+//     }
+//   }
+
+//   for (byte x = 0; x < kMatrixWidth; x++) {
+//     for (byte y = 0; y < kMatrixHeight; y++) {
+//       if (y < barpos[x]) {
+//         leds[XY(x,y)] = CHSV(-cycleHue, 255, 255);
+//       } else {
+//         leds[XY(x,y)] = CHSV(cycleHue, 255, 255);
+//       }
+//     }
+
+//     byte tempIncr = random(0,6);
+//     if (barpos[x] > 0 && tempIncr == 0) barpos[x]--;
+//     if (barpos[x] < 16 && tempIncr == 2) barpos[x]++;    
+//   }
+// }
+
+// Hue Rotation
+void colorRotation() {
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    audioActive = true;
+    effectDelay = 60;
+    fadeActive = 0;
+  }
+
+  fillAll(CHSV(cycleHue, 255, 255));
+}
+
+void graphicsFrame(int frame, CRGB fgColor,CRGB bgColor){
+  // Buffers for graphics generation
+  byte GlassesBits[kMatrixWidth][kMatrixHeight] = {{0}};    // 24 column x 8 row bit arrays (on/off frame)
+  int currentFrameAddress = pgm_read_word(&frameArray[frame]);
+  
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 5;
+  }
+
+
+  for (byte x = 0; x < kMatrixWidth; x++) {
+    for (byte y = 0; y < kMatrixHeight; y++) {
+      GlassesBits[x][y] = pgm_read_byte(currentFrameAddress+x+kMatrixWidth*y);
+      if (GlassesBits[x][y] == 1) leds[XY(x, y)] = fgColor;
+      else leds[XY(x,y)] = bgColor;
+    }
+  }
+}
+void eyesAnim(){
+  static byte frameSeq[] = {0,1,1,2,2,1,0,1,3,1,2,1};
+  static byte frameIndex = 0;
+  static unsigned long lastFrame = 0;
+  unsigned short frameDelay = 500;
+  
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 5;
+  }
+
+  
+  if (millis() > lastFrame+frameDelay) {
+    frameIndex++;
+    frameIndex=frameIndex%10;
+    lastFrame=millis();
+  }
+  
+  CRGB fgColor = CHSV(cycleHue, 255, 255); 
+
+  //CRGB bgColor = CHSV(cycleHue+128, 255, 255); 
+  graphicsFrame(frameSeq[frameIndex],fgColor,CRGB::Black);
+}
+
+// Display bursts of sparks
+void fireworks() {
+  byte sparksDone = 0;
+  static int sparkLife = 50;
+  static boolean boom = false;
+  
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 5;
+    gSkyburst = 1;
+    fadeActive = 1;
+  }
+  if (boom) {
+    FastLED.clear();
+    boom = false;
+  } else {
+    fadeAll(40);
+  }  
+  if (sparkLife > 0) sparkLife--;
+
+  for( byte b = 0; b < NUM_SPARKS; b++) {
+    if (sparkLife <= 0) gSparks[b].show = 0;
+    gSparks[b].Move();
+    gSparks[b].Draw();
+    sparksDone += gSparks[b].show;
+  }
+
+  if (sparksDone == 0) gSkyburst = 1;
+  //Serial.println(sparksDone);
+
+  if( gSkyburst) {
+    effectDelay = 5;
+    sparkLife = random(16,150);
+    CRGB color;
+    hsv2rgb_rainbow( CHSV( random8(), 255, 255), color);
+    accum88 sx = random(127-64,127+64)<<8;
+    accum88 sy = random(127-16,127+16)<<8;
+    for( byte b = 0; b < NUM_SPARKS; b++) {
+      gSparks[b].Skyburst(sx, sy, 0, color);
+    }
+    gSkyburst = 0;
+    sparksDone = 0;
+    fillAll(CRGB::Gray);
+    boom = true;
+  }
+}
+
+// radiating inward rainbow colors
+void radiateCenter() {
+  static byte offset  = 9; // counter for radial color wave motion
+  static int plasVector = 0; // counter for orbiting plasma center
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 20;
+    fadeActive = 1;
+  }
+
+  int xOffset = 0;
+  int yOffset = 4;
+
+  // Draw one frame of the animation into the LED array
+  for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      byte color = sin8(sqrt(sq(((float)x - 7.5) * 12 + xOffset) + sq(((float)y - 2) * 12 + yOffset)) + offset);
+      leds[XY(x, y)] = ColorFromPalette(currentPalette, color, 255);
+    }
+  }
+  offset--; // wraps at 255 for sin8
+  plasVector += 1; // using an int for slower orbit (wraps at 65536)
+}
+
+// radiating inward rainbow colors
+void radiateCenterMultiPalette() {
+  static byte offset  = 9; // counter for radial color wave motion
+  static int plasVector = 0; // counter for orbiting plasma center
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 20;
+    fadeActive = 1;
+    selectRandomPalette();
+  }
+
+  // Periodically choose a new palette, speed, and scale
+  ChangePaletteAndSettingsPeriodically();
+
+  // generate noise data
+  fillnoise8();
+  
+  // convert the noise data to colors in the LED array
+  // using the current palette
+  mapNoiseToLEDsUsingPalette();
+
+  int xOffset = 0;
+  int yOffset = 4;
+
+  // Draw one frame of the animation into the LED array
+  for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      byte color = sin8(sqrt(sq(((float)x - 7.5) * 12 + xOffset) + sq(((float)y - 2) * 12 + yOffset)) + offset);
+      leds[XY(x, y)] = ColorFromPalette(currentPalette, color, 255);
+    }
+  }
+  offset--; // wraps at 255 for sin8
+  plasVector += 1; // using an int for slower orbit (wraps at 65536)
+}
+const byte eyeBitmap[5] = {
+  0b00111000,
+  0b01111100,
+  0b01100100,
+  0b01100100,
+  0b00111000
+};
+
+void eyes() {
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 20;
+    fadeActive = 0;
+  }
+
+  CRGB currentColor;
+
+    for (byte y = 0; y < 6; y++) {
+      for (byte x = 0; x < 8; x++) {
+        if (bitRead(eyeBitmap[y], 7 - x) == 1) {
+          currentColor = CRGB(150, 150, 160);
+        } else {
+          currentColor = CHSV(224, 180, 255);
+        }
+
+        leds[XY(x, y)] = currentColor;
+        leds[XY(15 - x, y)] = currentColor;
+        leds[XY(4, 3)] = CRGB::Black;
+        leds[XY(4, 2)] = CHSV(160, 180, 255);
+        leds[XY(3, 2)] = CHSV(160, 180, 255);
+        leds[XY(3, 3)] = CHSV(160, 180, 255);
+        leds[XY(11, 2)] = CHSV(160, 180, 255);
+        leds[XY(11, 3)] = CRGB::Black;
+        leds[XY(12, 2)] = CHSV(160, 180, 255);
+        leds[XY(12, 3)] = CHSV(160, 180, 255);
+      }
+    }
+}
+
+// Smoothly falling colored dots
+void coloredSnow() {
+
+  static unsigned int snowCols[kMatrixWidth] = {0};
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    audioActive = true;
+    effectDelay = 20;
+    fadeActive = 0;
+  }
+
+  CRGB snowColor = CHSV(cycleHue, 255, 255);
+
+  FastLED.clear();
+
+  for (byte i = 0; i < kMatrixWidth; i++) {
+    if (snowCols[i] > 0) {
+      snowCols[i] += random(4,16);
+    } else {
+      if (random8(0,100) == 0) snowCols[i] = 1;
+    }
+    byte tempY = snowCols[i] >> 8;
+    byte tempRem = snowCols[i] & 0xFF;
+    if (tempY <= kMatrixHeight) leds[XY(i,tempY-1)] = snowColor % dim8_raw(255-tempRem);
+    if (tempY < kMatrixHeight) leds[XY(i,tempY)] = snowColor % dim8_raw(tempRem);
+    if (tempY > kMatrixHeight) snowCols[i] = 0;
+  }
+}
+// Smoothly falling white dots
+void snow() {
+
+  static unsigned int snowCols[kMatrixWidth] = {0};
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    audioActive = true;
+    effectDelay = 20;
+    fadeActive = 0;
+  }
+
+  CRGB snowColor = CRGB::White;
+
+  FastLED.clear();
+
+  for (byte i = 0; i < kMatrixWidth; i++) {
+    if (snowCols[i] > 0) {
+      snowCols[i] += random(4,16);
+    } else {
+      if (random8(0,100) == 0) snowCols[i] = 1;
+    }
+    byte tempY = snowCols[i] >> 8;
+    byte tempRem = snowCols[i] & 0xFF;
+    if (tempY <= kMatrixHeight) leds[XY(i,tempY-1)] = snowColor % dim8_raw(255-tempRem);
+    if (tempY < kMatrixHeight) leds[XY(i,tempY)] = snowColor % dim8_raw(tempRem);
+    if (tempY > kMatrixHeight) snowCols[i] = 0;
+  }
+}
+#define COOLING  71
+#define SPARKING 130
+void Fire2012WithPalette() {
+
+  bool gReverseDirection = true;
+
+  // Array of temperature readings at each simulation cell
+  static byte heat[NUM_LEDS];
+
+  CRGBPalette16 gPal;
+  gPal = HeatColors_p;
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    audioActive = true;
+    effectDelay = 30;
+    fadeActive = 0;
+  }
+
+  // Step 1.  Cool down every cell a little
+  for( int i = 0; i < NUM_LEDS; i++) {
+    heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
+  }
+
+  // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+  for( int k = NUM_LEDS - 1; k >= 2; k--) {
+    heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
+  }
+
+  // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
+  if( random8() < SPARKING ) {
+    int y = random8(7);
+    heat[y] = qadd8( heat[y], random8(160, 255) );
+  }
+
+  // Step 4.  Map from heat cells to LED colors
+  for( int j = 0; j < NUM_LEDS; j++) {
+    // Scale the heat value from 0-255 down to 0-240
+    // for best results with color palettes.
+    byte colorindex = scale8( heat[j], 200);
+    CRGB color = ColorFromPalette( gPal, colorindex);
+    int pixelnumber;
+    if( gReverseDirection ) {
+      pixelnumber = (NUM_LEDS - 1) - j;
+    } else {
+      pixelnumber = j;
+    }
+    leds[pixelnumber] = color;
+  }
+}
+
+void amazingNoise() {
+
+  if (effectInit == false) {
+    effectInit = true;
+    audioActive = true;
+    effectDelay = 10;
+    FastLED.clear();
+    // selectRandomPalette();
+    fadeActive = 0;
+  }
+  ChangePaletteAndSettingsPeriodically();
+  fillnoise8();
+  mapNoiseToLEDsUsingPalette();
+}
+
 // Triple Sine Waves
 void threeSine() {
 
